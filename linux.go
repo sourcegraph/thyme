@@ -4,6 +4,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type LinuxTracker struct{}
@@ -50,5 +51,5 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 		active = id
 	}
 
-	return &Snapshot{Windows: windows, Active: active}, nil
+	return &Snapshot{Windows: windows, Active: active, Time: time.Now()}, nil
 }
