@@ -48,9 +48,7 @@ s_Windows:
 				continue s_Windows
 			}
 		}
-		if !w.IsSystem() {
-			other = append(other, w)
-		}
+		other = append(other, w)
 	}
 
 	fmt.Fprintf(&b, "%s\n", s.Time.Format("Mon Jan 2 15:04:05 -0700 MST 2006"))
