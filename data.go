@@ -14,6 +14,10 @@ type Tracker interface {
 	// Snap returns a Snapshot reflecting the currently in-use windows
 	// at the current time.
 	Snap() (*Snapshot, error)
+
+	// Deps returns a string listing the dependencies that still need
+	// to be installed with instructions for how to install them.
+	Deps() string
 }
 
 // Stream represents all the sampling data gathered by Thyme.
