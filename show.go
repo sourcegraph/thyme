@@ -325,13 +325,13 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
   <body>
 
 	<div class="description">
-		This is a coarse-grained chart of all the applications you over the course of the day. Every bar represents an application.
+		This is a coarse-grained timeline of all the applications you use over the course of the day. Every bar represents an application.
 	</div>
     <div id="timeline_coarse" style="min-height: 500px;"></div>
 	<hr>
 
 	<div class="description">
-		This is a fine-grained chart of all the applications you over the course of the day. Every bar represents a distinct window.
+		This is a fine-grained timeline of all the applications you use over the course of the day. Every bar represents a distinct window.
 	</div>
     <div id="timeline_fine" style="min-height: 500px;"></div>
 	<hr>
