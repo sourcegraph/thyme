@@ -1,4 +1,4 @@
-# Thyme
+# <img alt="logo" src="/assets/images/thyme.png" height="40"> Thyme
 
 Spice up your day-to-day productivity with Thyme. Automatically track
 which applications you use and for how long.
@@ -85,3 +85,11 @@ Thyme differs from available offerings in the following ways:
 - Thyme does not send data over the network. It stores the data it
   collects on local disk. It's up to you whether you want to share it
   or not.
+
+## Attribution
+
+The [Thyme logo](https://thenounproject.com/term/thyme/356887/)
+<img alt="logo" src="/assets/images/thyme.png" height="40"> by
+[Anthony Bossard](https://thenounproject.com/le101edaltonien/) is
+licensed under
+[Creative Commons 3.0](https://creativecommons.org/licenses/by/3.0/us/).
