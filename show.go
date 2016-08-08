@@ -89,18 +89,7 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 
 func Stats(stream *Stream) error {
 	tlFine := NewTimeline(stream, func(w *Window) string { return w.Name })
-	tlCoarse := NewTimeline(stream, func(w *Window) string {
-		if w.Info().App != "" {
-			return w.Info().App
-		}
-		if w.Info().SubApp != "" {
-			return fmt.Sprintf("%s :: %s", w.Info().App, w.Info().SubApp)
-		}
-		if w.Info().Title != "" {
-			return fmt.Sprintf("%s :: %s :: %s", w.Info().App, w.Info().SubApp, w.Info().Title)
-		}
-		return w.Name
-	})
+	tlCoarse := NewTimeline(stream, appID)
 
 	if err := statsTmpl.Execute(os.Stdout, &statsPage{
 		Fine:   tlFine,
@@ -239,6 +228,19 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 
   </body>
 </html>`))
+
+func appID(w *Window) string {
+	if w.Info().App != "" {
+		return w.Info().App
+	}
+	if w.Info().SubApp != "" {
+		return fmt.Sprintf("%s :: %s", w.Info().App, w.Info().SubApp)
+	}
+	if w.Info().Title != "" {
+		return fmt.Sprintf("%s :: %s :: %s", w.Info().App, w.Info().SubApp, w.Info().Title)
+	}
+	return w.Name
+}
 
 func List(stream *Stream) {
 	fmt.Printf("%s", stream.Print())
