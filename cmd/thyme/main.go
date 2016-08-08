@@ -101,7 +101,9 @@ func (c *ShowCmd) Execute(args []string) error {
 		}
 		switch c.What {
 		case "stats":
-			thyme.Stats(&stream)
+			if err := thyme.Stats(&stream); err != nil {
+				return err
+			}
 		case "list":
 			fallthrough
 		default:

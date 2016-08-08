@@ -12,6 +12,7 @@ type Tracker interface {
 }
 
 type Stream struct {
+	// Snapshots is a list of window snapshots ordered by time
 	Snapshots []*Snapshot
 }
 
