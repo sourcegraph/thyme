@@ -3,9 +3,74 @@ package thyme
 import (
 	"fmt"
 	"os"
+	"sort"
 	"text/template"
 	"time"
 )
+
+type AggTime struct {
+	Charts []*BarChart
+}
+
+type BarChart struct {
+	ID     string
+	YLabel string
+	XLabel string
+	Title  string
+	Series map[string]int
+}
+
+type Bar struct {
+	Label string
+	Count int
+}
+
+func NewBarChart(id, x, y, title string) *BarChart {
+	return &BarChart{ID: id, XLabel: x, YLabel: y, Title: title, Series: make(map[string]int)}
+}
+
+func (c *BarChart) Plus(label string, n int) {
+	c.Series[label] += n
+}
+
+type sortBars struct {
+	bars []Bar
+}
+
+func (s sortBars) Len() int           { return len(s.bars) }
+func (s sortBars) Less(a, b int) bool { return s.bars[a].Count > s.bars[b].Count }
+func (s sortBars) Swap(a, b int)      { s.bars[a], s.bars[b] = s.bars[b], s.bars[a] }
+
+func (c *BarChart) OrderedBars() []Bar {
+	var bars []Bar
+	for l, c := range c.Series {
+		bars = append(bars, Bar{Label: l, Count: c})
+	}
+	s := sortBars{bars}
+	sort.Sort(s)
+	return s.bars
+}
+
+func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
+	active := NewBarChart("Active", "App", "Samples", "Time (multiplied by number of windows) application was active")
+	visible := NewBarChart("Visible", "App", "Samples", "Time (multiplied by number of windows) application was visible")
+	all := NewBarChart("All", "App", "Samples", "Time (multiplied by number of windows) application was open")
+	for _, snap := range stream.Snapshots {
+		windows := make(map[int64]*Window)
+		for _, win := range snap.Windows {
+			windows[win.ID] = win
+		}
+
+		active.Plus(labelFunc(windows[snap.Active]), 1)
+		for _, v := range snap.Visible {
+			visible.Plus(labelFunc(windows[v]), 1)
+		}
+		for _, win := range snap.Windows {
+			all.Plus(labelFunc(win), 1)
+		}
+	}
+	return &AggTime{Charts: []*BarChart{active, visible, all}}
+}
 
 type Timeline struct {
 	Start time.Time
@@ -90,10 +155,12 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 func Stats(stream *Stream) error {
 	tlFine := NewTimeline(stream, func(w *Window) string { return w.Name })
 	tlCoarse := NewTimeline(stream, appID)
+	agg := NewAggTime(stream, appID)
 
 	if err := statsTmpl.Execute(os.Stdout, &statsPage{
 		Fine:   tlFine,
 		Coarse: tlCoarse,
+		Agg:    agg,
 	}); err != nil {
 		return err
 	}
@@ -107,15 +174,25 @@ func timeToJS(t time.Time) string {
 type statsPage struct {
 	Fine   *Timeline
 	Coarse *Timeline
+	Agg    *AggTime
 }
 
 var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 	"timeToJS": timeToJS,
 }).Parse(`<html>
   <head>
+	<style>
+		.description {
+			font-family: Roboto;
+			font-size: 16px;
+			padding: 16px 0;
+			color: rgb(117, 117, 117);
+		}
+	</style>
+
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['timeline']});
+      google.charts.load('current', {'packages':['corechart', 'bar', 'timeline']});
 	</script>
 
 	{{with .Coarse}}
@@ -163,6 +240,37 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
         chart.draw(dataTable, options);
       }
     </script>
+	{{end}}
+
+	{{range $chart := .Agg.Charts}}
+	<script type="text/javascript">
+	google.charts.setOnLoadCallback(drawBarChart{{$chart.ID}});
+	function drawBarChart{{$chart.ID}}() {
+      var data = google.visualization.arrayToDataTable([
+        ['Application', 'Number of samples'],
+		{{range $chart.OrderedBars}}
+		['{{.Label}}', {{.Count}}],
+		{{end}}
+      ]);
+
+      var options = {
+        chart: {
+          title: '{{$chart.Title}}'
+        },
+		legend: { position: "none" },
+        hAxis: {
+          title: '{{$chart.YLabel}}',
+          minValue: 0,
+        },
+        vAxis: {
+          title: '{{$chart.XLabel}}'
+        },
+        bars: 'horizontal'
+      };
+      var material = new google.charts.Bar(document.getElementById('bar_chart_{{$chart.ID}}'));
+      material.draw(data, options);
+    }
+	</script>
 	{{end}}
 
 	{{with .Fine}}
@@ -216,15 +324,22 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
   </head>
   <body>
 
-	<div>
+	<div class="description">
 		This is a coarse-grained chart of all the applications you over the course of the day. Every bar represents an application.
 	</div>
     <div id="timeline_coarse" style="min-height: 500px;"></div>
+	<hr>
 
-	<div>
+	<div class="description">
 		This is a fine-grained chart of all the applications you over the course of the day. Every bar represents a distinct window.
 	</div>
     <div id="timeline_fine" style="min-height: 500px;"></div>
+	<hr>
+
+	{{range $chart := .Agg.Charts}}
+	<div id="bar_chart_{{$chart.ID}}"></div>
+	<hr>
+	{{end}}
 
   </body>
 </html>`))
@@ -237,7 +352,7 @@ func appID(w *Window) string {
 		return fmt.Sprintf("%s :: %s", w.Info().App, w.Info().SubApp)
 	}
 	if w.Info().Title != "" {
-		return fmt.Sprintf("%s :: %s :: %s", w.Info().App, w.Info().SubApp, w.Info().Title)
+		return w.Info().Title
 	}
 	return w.Name
 }
