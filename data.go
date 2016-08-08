@@ -7,15 +7,22 @@ import (
 	"time"
 )
 
+// Tracker tracks application usage. An implementation that satisfies
+// this interface is required for each OS windowing system Thyme
+// supports.
 type Tracker interface {
+	// Snap returns a Snapshot reflecting the currently in-use windows
+	// at the current time.
 	Snap() (*Snapshot, error)
 }
 
+// Stream represents all the sampling data gathered by Thyme.
 type Stream struct {
-	// Snapshots is a list of window snapshots ordered by time
+	// Snapshots is a list of window snapshots ordered by time.
 	Snapshots []*Snapshot
 }
 
+// Print returns a pretty-printed representation of the snapshot.
 func (s Stream) Print() string {
 	var b bytes.Buffer
 	for _, snap := range s.Snapshots {
@@ -24,6 +31,8 @@ func (s Stream) Print() string {
 	return string(b.Bytes())
 }
 
+// Snapshot represents the current state of all in-use application
+// windows at a moment in time.
 type Snapshot struct {
 	Time    time.Time
 	Windows []*Window
@@ -31,6 +40,7 @@ type Snapshot struct {
 	Visible []int64
 }
 
+// Print returns a pretty-printed representation of the snapshot.
 func (s Snapshot) Print() string {
 	var b bytes.Buffer
 
@@ -73,11 +83,18 @@ s_Windows:
 	return string(b.Bytes())
 }
 
+// Window represents an application window.
 type Window struct {
-	ID   int64
+	// ID is the numerical identifier of the window.
+	ID int64
+
+	// Name is the display name of the window (typically what the
+	// windowing system shows in the top bar of the window).
 	Name string
 }
 
+// systemNames is a set of blacklisted window names that are known to
+// be used by system windows that aren't visible to the user.
 var systemNames = map[string]struct{}{
 	"XdndCollectionWindowImp": {},
 	"unity-launcher":          {},
@@ -97,6 +114,8 @@ func (w *Window) IsSystem() bool {
 	return false
 }
 
+// Info returns more structured metadata about a window. The metadata
+// is extracted using heuristics.
 func (w *Window) Info() *Winfo {
 	fields := strings.Split(w.Name, " - ")
 	first := strings.TrimSpace(fields[0])
@@ -118,12 +137,23 @@ func (w *Window) Info() *Winfo {
 	}
 }
 
+// Winfo is structured metadata info about a window.
 type Winfo struct {
-	App    string
+	// App is the application that controls the window.
+	App string
+
+	// SubApp is the sub-application that controls the window. An
+	// example is a web app (e.g., Sourcegraph) that runs
+	// inside a Chrome tab. In this case, the App field would be
+	// "Google Chrome" and the SubApp field would be "Sourcegraph".
 	SubApp string
-	Title  string
+
+	// Title is the title of the window after the App and SubApp name
+	// have been stripped.
+	Title string
 }
 
+// Print returns a pretty-printed representation of the snapshot.
 func (w Winfo) Print() string {
 	return fmt.Sprintf("[%s|%s|%s]", w.App, w.SubApp, w.Title)
 }

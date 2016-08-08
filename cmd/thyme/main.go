@@ -21,6 +21,7 @@ func init() {
 	}
 }
 
+// TrackCmd is the subcommand that tracks application usage.
 type TrackCmd struct {
 	Out string `long:"out" short:"o" description:"output file"`
 }
@@ -72,6 +73,8 @@ func (c *TrackCmd) Execute(args []string) error {
 	return nil
 }
 
+// ShowCmd is the subcommand that reads the data emitted by the track
+// subcommand and displays the data to the user.
 type ShowCmd struct {
 	In   string `long:"in" short:"i" description:"input file"`
 	What string `long:"what" short:"w" description:"what to show {list,stats}" default:"list"`
