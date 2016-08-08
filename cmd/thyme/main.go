@@ -6,8 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/beyang/thyme"
 	"github.com/jessevdk/go-flags"
+	"github.com/sourcegraph/thyme"
 )
 
 var CLI = flags.NewNamedParser("thyme", flags.PrintErrors|flags.PassDoubleDash)
