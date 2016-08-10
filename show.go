@@ -241,7 +241,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 		{{range .Rows.Active}}
 			[
 				"Active",
-				"{{.Label}}",
+				{{printf "%q" .Label}},
 				{{timeToJS .Start}},
 				{{timeToJS .End}},
 			],
@@ -249,7 +249,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 		{{range .Rows.Visible}}
 			[
 				"Visible",
-				"{{.Label}}",
+				{{printf "%q" .Label}},
 				{{timeToJS .Start}},
 				{{timeToJS .End}},
 			],
@@ -257,7 +257,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 		{{range .Rows.All}}
 			[
 				"All",
-				"{{.Label}}",
+				{{printf "%q" .Label}},
 				{{timeToJS .Start}},
 				{{timeToJS .End}},
 			],
@@ -279,7 +279,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
       var data = google.visualization.arrayToDataTable([
         ['Application', 'Number of samples'],
 		{{range $chart.OrderedBars}}
-		['{{.Label}}', {{.Count}}],
+		[{{printf "%q" .Label}}, {{.Count}}],
 		{{end}}
       ]);
 
@@ -319,7 +319,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 		{{range .Rows.Active}}
 			[
 				"Active",
-				"{{.Label}}",
+				{{printf "%q" .Label}},
 				{{timeToJS .Start}},
 				{{timeToJS .End}},
 			],
@@ -327,7 +327,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 		{{range .Rows.Visible}}
 			[
 				"Visible",
-				"{{.Label}}",
+				{{printf "%q" .Label}},
 				{{timeToJS .Start}},
 				{{timeToJS .End}},
 			],
@@ -335,7 +335,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 		{{range .Rows.All}}
 			[
 				"All",
-				"{{.Label}}",
+				{{printf "%q" .Label}},
 				{{timeToJS .Start}},
 				{{timeToJS .End}},
 			],
