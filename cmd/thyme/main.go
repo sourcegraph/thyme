@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/sourcegraph/thyme"
@@ -29,7 +30,16 @@ type TrackCmd struct {
 var trackCmd TrackCmd
 
 func (c *TrackCmd) Execute(args []string) error {
-	t := thyme.NewLinuxTracker()
+	var t thyme.Tracker
+	switch runtime.GOOS {
+	case "windows":
+		return fmt.Errorf("Windows is unsupported")
+	case "darwin":
+		t = thyme.NewDarwinTracker()
+	default:
+		t = thyme.NewLinuxTracker()
+	}
+
 	snap, err := t.Snap()
 	if err != nil {
 		return err
