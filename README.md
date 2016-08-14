@@ -49,9 +49,8 @@ $ go get github.com/sourcegraph/thyme/cmd/thyme
 $ thyme dep
 ```
 
-`thyme` may depend on a few OS-specific command-line tools. `thyme dep` displays instructions for installing them.
-
-Verify `thyme` works with
+Thyme may depend on a few OS-specific command-line tools. `thyme dep` displays instructions for installing them. Verify
+`thyme` works with
 
 ```
 $ thyme track
