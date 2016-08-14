@@ -51,8 +51,8 @@ In addition, `thyme` depends on a few OS-specific command-line tools.
 After installing `thyme`, run `thyme dep` to get a list of things you
 need to install and instructions for installing them.
 
-*Note:* Thyme currently supports Linux (using X-Windows). Pull requests are
-welcome for macOS and Windows!
+*Note:* Thyme currently supports Linux (using X-Windows) and macOS (via the AppleScript "System Events" API). Pull
+requests are welcome for Windows!
 
 ## Use cases
 
