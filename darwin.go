@@ -87,8 +87,8 @@ end tell
 )
 
 func (t *DarwinTracker) Deps() string {
-	return `No external dependencies are required, but you do need to enable privileges for "System Events" in System Preferences > Security & Privacy > Accessibility.
-
+	return `
+No external dependencies are required, but you do need to enable privileges for "System Events" in System Preferences > Security & Privacy > Accessibility.
 See https://support.apple.com/en-us/HT202802 for details.
 `
 }

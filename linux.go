@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// LinuxTracker tracks application usage on Linux via a few standard command-line utilities.
 type LinuxTracker struct{}
 
 var _ Tracker = (*LinuxTracker)(nil)
@@ -18,7 +19,12 @@ func NewLinuxTracker() Tracker {
 }
 
 func (t *LinuxTracker) Deps() string {
-	return "TODO"
+	return `Install the following command-line utilities via your package manager (e.g., apt) of choice:
+* xdpyinfo
+* xwininfo
+* xdotool
+* wmctrl
+`
 }
 
 func (t *LinuxTracker) Snap() (*Snapshot, error) {

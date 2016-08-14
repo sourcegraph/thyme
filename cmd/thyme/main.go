@@ -20,6 +20,9 @@ func init() {
 	if _, err := CLI.AddCommand("show", "", "visualize data", &showCmd); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := CLI.AddCommand("dep", "", "external dependencies that need to be installed", &depCmd); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // TrackCmd is the subcommand that tracks application usage.
@@ -30,16 +33,10 @@ type TrackCmd struct {
 var trackCmd TrackCmd
 
 func (c *TrackCmd) Execute(args []string) error {
-	var t thyme.Tracker
-	switch runtime.GOOS {
-	case "windows":
-		return fmt.Errorf("Windows is unsupported")
-	case "darwin":
-		t = thyme.NewDarwinTracker()
-	default:
-		t = thyme.NewLinuxTracker()
+	t, err := getTracker()
+	if err != nil {
+		return err
 	}
-
 	snap, err := t.Snap()
 	if err != nil {
 		return err
@@ -126,6 +123,19 @@ func (c *ShowCmd) Execute(args []string) error {
 	return nil
 }
 
+type DepCmd struct{}
+
+var depCmd DepCmd
+
+func (c *DepCmd) Execute(args []string) error {
+	t, err := getTracker()
+	if err != nil {
+		return err
+	}
+	fmt.Println(t.Deps())
+	return nil
+}
+
 func main() {
 	run := func() error {
 		_, err := CLI.Parse()
@@ -138,5 +148,16 @@ func main() {
 	if err := run(); err != nil {
 		log.Print(err)
 		os.Exit(1)
+	}
+}
+
+func getTracker() (thyme.Tracker, error) {
+	switch runtime.GOOS {
+	case "windows":
+		return nil, fmt.Errorf("Windows is unsupported")
+	case "darwin":
+		return thyme.NewDarwinTracker(), nil
+	default:
+		return thyme.NewLinuxTracker(), nil
 	}
 }
