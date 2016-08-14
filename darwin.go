@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+// DarwinTracker tracks application usage using the "System Events" API in AppleScript. Due to the liminations of this
+// API, the DarwinTracker will not be able to detect individual windows of applications that are not scriptable (in the
+// AppleScript sense). For these applications, a single window is emitted with the name set to the application process
+// name and the ID set to the process ID.
 type DarwinTracker struct{}
 
 var _ Tracker = (*DarwinTracker)(nil)
@@ -83,8 +87,10 @@ end tell
 )
 
 func (t *DarwinTracker) Deps() string {
-	// TODO: mention requirement of enabling privileged Accessibility tools in preferences
-	return ""
+	return `No external dependencies are required, but you do need to enable privileges for "System Events" in System Preferences > Security & Privacy > Accessibility.
+
+See https://support.apple.com/en-us/HT202802 for details.
+`
 }
 
 func (t *DarwinTracker) Snap() (*Snapshot, error) {
