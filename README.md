@@ -8,6 +8,7 @@ which applications you use and for how long.
 - Stores data locally, giving you full control and privacy
 - [Open-source](https://sourcegraph.com/github.com/sourcegraph/thyme/-/def/GoPackage/github.com/sourcegraph/thyme/cmd/thyme/-/main.go/TrackCmd/Execute), [well-documented](https://godoc.org/github.com/sourcegraph/thyme), and easily extensible
 
+Thyme is a work in progress, so please report bugs!
 
 ## Features
 
