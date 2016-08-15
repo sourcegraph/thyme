@@ -19,7 +19,7 @@ Thyme is a work in progress, so please report bugs! Want to see how it works? [D
    $ watch -n 30 thyme track -o thyme.json
    ```
 
-2. Create charts showing application usage over time.
+2. Create charts showing application usage over time. In a new window:
    ```
    $ thyme show -i thyme.json -w stats > thyme.html
    ```
