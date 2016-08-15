@@ -14,17 +14,17 @@ Thyme is a work in progress, so please report bugs! Want to see how it works? [D
 
 ### Simple CLI
 
-1. Record which applications you use every 30 seconds:
+1 Record which applications you use every 30 seconds:
 ```
 $ watch -n 30 thyme track -o thyme.json
 ```
 
-2. Create charts showing application usage over time.
+2 Create charts showing application usage over time.
 ```
 $ thyme show -i thyme.json -w stats > thyme.html
 ```
 
-3. Open `thyme.html` in your browser of choice to see the charts
+3 Open `thyme.html` in your browser of choice to see the charts
    below.
 
 ### Application usage timeline
