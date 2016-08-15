@@ -42,10 +42,17 @@ Thyme is a work in progress, so please report bugs! Want to see how it works? [D
 
 ## Install
 
-Install from source:
+Install from source for the first time:
 
 ```
 $ go get github.com/sourcegraph/thyme/cmd/thyme
+$ thyme dep
+```
+
+If you have previously installed Thyme and wish to install a new version:
+
+```
+$ go get -u github.com/sourcegraph/thyme/cmd/thyme
 $ thyme dep
 ```
 
