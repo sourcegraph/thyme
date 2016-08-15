@@ -1,6 +1,6 @@
 # <img alt="logo" src="/assets/images/thyme.png" height="40"> Thyme
 
-Spice up your day-to-day productivity with Thyme. Automatically track
+Spice up your day-to-day productivity with Thyme by [Sourcegraph](sourcegraph.com). Automatically track
 which applications you use and for how long.
 
 - Simple CLI to track and analyze your application usage
