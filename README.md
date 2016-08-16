@@ -10,6 +10,8 @@ which applications you use and for how long.
 
 Thyme is a work in progress, so please report bugs! Want to see how it works? [Dive into the source here.](https://sourcegraph.com/github.com/sourcegraph/thyme/-/def/GoPackage/github.com/sourcegraph/thyme/cmd/thyme/-/main.go/TrackCmd/Execute)
 
+Want to share what you've learned about your Thyme? Join the discussion on [Twitter](https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fsourcegraph%2Fthyme&original_referer=https%3A%2F%2Fgithub.com).
+
 ## Features
 
 ### Simple CLI
