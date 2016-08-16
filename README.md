@@ -20,6 +20,10 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
    ```
    $ watch -n 30 thyme track -o thyme.json
    ```
+   An alternative to using ```watch``` is:
+   ```
+   $ while true; do thyme track -o thyme.json; sleep 30s; done;
+   ```
 
 2. Create charts showing application usage over time. In a new window:
    ```
