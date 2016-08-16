@@ -22,6 +22,8 @@ func NewDarwinTracker() Tracker {
 	return &DarwinTracker{}
 }
 
+// QUESTION how do I check for required dependencies?
+
 // allWindowsScript fetches the windows of all scriptable applications.  It
 // iterates through each application process known to System Events and attempts
 // to script the application with the same name as the application process. If
