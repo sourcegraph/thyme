@@ -44,23 +44,14 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
 
 ## Install
 
-Install from source for the first time:
-
-```
-$ go get github.com/sourcegraph/thyme/cmd/thyme
-$ thyme dep
-```
-
-If you have previously installed Thyme and wish to install a new version:
-
+1. [Install Go.](https://golang.org/dl/)
+2. Run
 ```
 $ go get -u github.com/sourcegraph/thyme/cmd/thyme
 $ thyme dep
 ```
-
-Thyme may depend on a few OS-specific command-line tools. `thyme dep` displays instructions for installing them. Verify
-`thyme` works with
-
+3. Follow the instructions printed by `thyme dep`.
+4. Verify `thyme` works with
 ```
 $ thyme track
 ```
