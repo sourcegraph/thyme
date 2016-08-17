@@ -28,27 +28,6 @@ func (t *LinuxTracker) Deps() string {
 }
 
 func (t *LinuxTracker) Snap() (*Snapshot, error) {
-	var viewWidth, viewHeight int
-	{
-		out, err := exec.Command("bash", "-c", "xdpyinfo | grep dimensions").Output()
-		if err != nil {
-			return nil, err
-		}
-		matches := dimRx.FindStringSubmatch(string(out))
-		if len(matches) != 3 {
-			return nil, fmt.Errorf("could not parse viewport dimensions from output line %q", string(out))
-		}
-		w, err := strconv.Atoi(matches[1])
-		if err != nil {
-			return nil, err
-		}
-		h, err := strconv.Atoi(matches[2])
-		if err != nil {
-			return nil, err
-		}
-		viewWidth, viewHeight = w, h
-	}
-
 	var windows []*Window
 	{
 		out, err := exec.Command("wmctrl", "-l").Output()
@@ -76,28 +55,11 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 	var visible []int64
 	{
 		for _, window := range windows {
-			out_, err := exec.Command("xwininfo", "-id", fmt.Sprintf("%d", window.ID), "-stats").Output()
+			out, err := exec.Command("xwininfo", "-id", fmt.Sprintf("%d", window.ID), "-stats").Output()
 			if err != nil {
 				return nil, err
 			}
-			out := string(out_)
-			x, err := parseWinDim(xRx, out, "X")
-			if err != nil {
-				return nil, err
-			}
-			y, err := parseWinDim(yRx, out, "Y")
-			if err != nil {
-				return nil, err
-			}
-			w, err := parseWinDim(wRx, out, "W")
-			if err != nil {
-				return nil, err
-			}
-			h, err := parseWinDim(hRx, out, "H")
-			if err != nil {
-				return nil, err
-			}
-			if isVisible(x, y, w, h, viewHeight, viewWidth) {
+			if vis.Match(out) {
 				visible = append(visible, window.ID)
 			}
 		}
@@ -131,11 +93,7 @@ func isVisible(x, y, w, h, viewHeight, viewWidth int) bool {
 }
 
 var (
-	dimRx = regexp.MustCompile(`dimensions:\s+([0-9]+)x([0-9]+)\s+pixels`)
-	xRx   = regexp.MustCompile(`Absolute upper\-left X:\s+(\-?[0-9]+)`)
-	yRx   = regexp.MustCompile(`Absolute upper\-left Y:\s+(\-?[0-9]+)`)
-	wRx   = regexp.MustCompile(`Width:\s+([0-9]+)`)
-	hRx   = regexp.MustCompile(`Height:\s+([0-9]+)`)
+	vis = regexp.MustCompile(`Map State:\s+IsViewable`)
 )
 
 // parseWinDim parses window dimension info from the output of `xwininfo`
