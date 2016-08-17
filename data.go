@@ -92,6 +92,10 @@ type Window struct {
 	// ID is the numerical identifier of the window.
 	ID int64
 
+	// Desktop is the numerical identifier of the desktop the
+	// window belongs to.  Equal to -1 if the window is sticky.
+	Desktop int64
+
 	// Name is the display name of the window (typically what the
 	// windowing system shows in the top bar of the window).
 	Name string
@@ -116,6 +120,18 @@ func (w *Window) IsSystem() bool {
 		return true
 	}
 	return false
+}
+
+// IsSticky returns true if the window is a sticky window (i.e.
+// present on all desktops)
+func (w *Window) IsSticky() bool {
+	return w.Desktop == -1
+}
+
+// IsOnDesktop returns true if the window is present on the specified
+// desktop
+func (w *Window) IsOnDesktop(desktop int64) bool {
+	return w.IsSticky() || w.Desktop == desktop
 }
 
 // Info returns more structured metadata about a window. The metadata

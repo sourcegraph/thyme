@@ -61,14 +61,41 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 			if len(fields) < 4 {
 				continue
 			}
-			id_, name := fields[0], strings.Join(fields[3:], " ")
+			id_, desktop_, name := fields[0], fields[1], strings.Join(fields[3:], " ")
 			id, err := strconv.ParseInt(id_, 0, 64)
 			if err != nil {
 				return nil, err
 			}
-			w := Window{ID: id, Name: name}
+			desktop, err := strconv.ParseInt(desktop_, 0, 64)
+			if err != nil {
+				return nil, err
+			}
+			w := Window{ID: id, Desktop: desktop, Name: name}
 			if !w.IsSystem() {
 				windows = append(windows, &w)
+			}
+		}
+	}
+
+	var currentDesktop int64
+	{
+		out, err := exec.Command("wmctrl", "-d").Output()
+		if err != nil {
+			return nil, err
+		}
+		lines := strings.Split(string(out), "\n")
+		for _, line := range lines {
+			fields := strings.Fields(line)
+			if len(fields) < 2 {
+				continue
+			}
+			id_, mode := fields[0], fields[1]
+			id, err := strconv.ParseInt(id_, 0, 64)
+			if err != nil {
+				return nil, err
+			}
+			if "*" == mode {
+				currentDesktop = id
 			}
 		}
 	}
@@ -97,7 +124,7 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 			if err != nil {
 				return nil, err
 			}
-			if isVisible(x, y, w, h, viewHeight, viewWidth) {
+			if window.IsOnDesktop(currentDesktop) && isVisible(x, y, w, h, viewHeight, viewWidth) {
 				visible = append(visible, window.ID)
 			}
 		}
