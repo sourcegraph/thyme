@@ -12,15 +12,14 @@ import (
 
 var version = "[manual build]"
 
-var usage = `thyme - automatically track which applications you use and for long.
+var usage = `thyme - automatically track which applications you use and for how long.
 
-thyme is simple time tracker, which tracks active window names and collect
-statistics over active, open and visible windows.
-
-Statistics is collected into local JSON file, which can be transformed into
-pretty HTML report.
-
-thyme is a local CLI tool and do not send any info over network.
+  \|//   thyme is simple time tracker, which tracks active window names and
+ W Y/    collect statistics over active, open and visible windows. Statistics
+  \|  ,  is collected into local JSON file, which can be transformed
+   \_/   into pretty HTML report.
+    \
+     \_  thyme is a local CLI tool and do not send any info over network.
 
 Usage:
   thyme track -o <file>
