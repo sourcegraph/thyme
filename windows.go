@@ -87,10 +87,10 @@ func (t *WindowsTracker) Snap() (snap *Snapshot, err error) {
 		if b != 0 {
 			currentTitle := getWindowTitle(uintptr(hwnd))
 			currentId := getWindowID(uintptr(hwnd))
-			if activeTitle == currentTitle {
-				active = currentId
-			}
 			if !windowsIgnore(currentTitle) {
+				if activeTitle == currentTitle {
+					active = currentId
+				}
 				v, _, _ := procIsWindowVisible.Call(uintptr(hwnd))
 				if v != 0 {
 					visible = append(visible, currentId)
