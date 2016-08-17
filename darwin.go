@@ -72,17 +72,17 @@ end try
 	// name is valid).
 	visibleWindowsScript = `
 tell application "System Events"
-  repeat with proc in (every process whose visible is true)
-    set procName to (name of proc)
-    set procID to (id of proc)
-    log "PROCESS " & procID & ":" & procName
-    tell proc
-      repeat with i from 1 to (count windows)
-        log "WINDOW -1:" & (name of window i) as string
-      end repeat
-    end tell
-  end repeat
+	set listOfProcesses to (every process whose visible is true)
 end tell
+repeat with proc in listOfProcesses
+	set procName to (name of proc)
+	set procID to (id of proc)
+	log "PROCESS " & procID & ":" & procName
+	set app_windows to (every window of proc)
+	repeat with each_window in app_windows
+		log "WINDOW -1:" & (name of each_window) as string
+	end repeat
+end repeat
 `
 )
 
