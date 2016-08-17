@@ -34,7 +34,7 @@ Commands:
   show                Will show computed applications usage based on collected
                        statistics.
 
-  dep                 Show miscallaneous intallation info.
+  dep                 Show miscallaneous installation info.
 
 Options:
   -h --help           Show this help.
