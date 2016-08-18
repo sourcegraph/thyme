@@ -18,10 +18,6 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
 
 1. Record which applications you use every 30 seconds:
    ```
-   $ watch -n 30 thyme track -o thyme.json
-   ```
-   An alternative to using ```watch``` is:
-   ```
    $ while true; do thyme track -o thyme.json; sleep 30s; done;
    ```
 
@@ -53,10 +49,12 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
    $ go get -u github.com/sourcegraph/thyme/cmd/thyme
    ```
    Alternatively, if you don't want to install Go, just download the `thyme` binary [here](https://github.com/sourcegraph/thyme/releases).
+
 1. Follow the instructions printed by `thyme dep`.
    ```
    $ thyme dep
    ```
+
 1. Verify `thyme` works with
    ```
    $ thyme track
