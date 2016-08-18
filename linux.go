@@ -43,7 +43,9 @@ func (t *LinuxTracker) Deps() string {
 	}
 
 	if depsRequired {
-		return output+"\r\n\r\nExample deb/apt install command: apt-get install x11-utils xdotool wmctrl\r\nExample rpm/yum install command: yum install xorg-x11-utils xdotool wmctrl"
+		output += "\r\n\r\nExample deb/apt install command: apt-get install x11-utils xdotool wmctrl"
+		output += "\r\nExample rpm/yum install command: yum install xorg-x11-utils xdotool wmctrl"
+		return output
 	} else {
 		return `All dependencies already installed.`
 	}
