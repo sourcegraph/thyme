@@ -146,10 +146,18 @@ func (w *Window) Info() *Winfo {
 	first := strings.TrimSpace(fields[0])
 	last := strings.TrimSpace(fields[len(fields)-1])
 	if last == "Google Chrome" {
-		return &Winfo{
-			App:    "Google Chrome",
-			SubApp: strings.TrimSpace(fields[len(fields)-2]),
-			Title:  strings.Join(fields[0:len(fields)-2], " - "),
+		if len(fields) > 1 {
+			return &Winfo{
+				App:    "Google Chrome",
+				SubApp: strings.TrimSpace(fields[len(fields)-2]),
+				Title:  strings.Join(fields[0:len(fields)-2], " - "),
+			}
+		} else {
+			return &Winfo{
+				App:    "Google Chrome",
+				SubApp: "",
+				Title:  "",
+			}
 		}
 	} else if first == "Slack" {
 		return &Winfo{
