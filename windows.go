@@ -40,8 +40,8 @@ var (
 	procGetWindowThreadProcessId = user.NewProc("GetWindowThreadProcessId")
 )
 
-func (t *WindowsTracker) Deps() string {
-	return "Nothing, Ready to Go!"
+func (t *WindowsTracker) CheckDependencies() {
+	// Nothing, Ready to Go!
 }
 
 // getWindowTitle returns a title of a window of the provided system window handle

@@ -90,13 +90,11 @@ end repeat
 `
 )
 
-func (t *DarwinTracker) Deps() string {
-	return `
-You will need the osascript command-line utility. You can install it via the Apple developer tools ('xcode-select --install') or npm ('npm install --save osascript').
-
-You will need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
-See https://support.apple.com/en-us/HT202802 for details.
-`
+func (t *DarwinTracker) CheckDependencies() {
+	_, err := exec.LookPath("osascript")
+	if err != nil {
+		log.Fatal("You will need the osascript command-line utility. You can install it via the Apple developer tools ('xcode-select --install') or npm ('npm install --save osascript').")
+	}
 }
 
 func (t *DarwinTracker) Snap() (*Snapshot, error) {
