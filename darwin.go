@@ -92,7 +92,7 @@ end tell
 
 func (t *DarwinTracker) Deps() string {
 	return `
-You will need the OSX 'watch' command. With Homebrew installed, in your command line enter "brew install watch". You will also need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
+You will need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
 See https://support.apple.com/en-us/HT202802 for details.
 `
 }
