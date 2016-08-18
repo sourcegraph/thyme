@@ -211,6 +211,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 	"timeToJS": timeToJS,
 }).Parse(`<html>
   <head>
+	<meta charset="utf-8">
 	<style>
 		.description {
 			font-family: Roboto;
