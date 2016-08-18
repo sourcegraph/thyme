@@ -62,8 +62,7 @@ $ thyme track
 
 This should display JSON describing which applications are currently active, visible, and present on your system.
 
-**Note:** Thyme currently supports Linux (using X-Windows) and macOS (via the AppleScript "System Events" API). Pull
-requests are welcome for Windows!
+Thyme currently supports Linux, macOS, and Windows.
 
 ## Use cases
 

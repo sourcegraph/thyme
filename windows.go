@@ -80,7 +80,7 @@ func (t *WindowsTracker) Snap() (snap *Snapshot, err error) {
 
 	cb := syscall.NewCallback(func(hwnd syscall.Handle, lparam uintptr) uintptr {
 		if lparam != cbId {
-			err = fmt.Errorf("lparam does not match what callback expected; recieved (%d), expected (%d)", lparam, cbId)
+			err = fmt.Errorf("lparam does not match what callback expected; received (%d), expected (%d)", lparam, cbId)
 			return 0
 		}
 		b, _, _ := procIsWindow.Call(uintptr(hwnd))
