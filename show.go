@@ -44,7 +44,9 @@ func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
 			windows[win.ID] = win
 		}
 
-		active.Plus(labelFunc(windows[snap.Active]), 1)
+		if win := windows[snap.Active]; win != nil {
+			active.Plus(labelFunc(windows[snap.Active]), 1)
+		}
 		for _, v := range snap.Visible {
 			visible.Plus(labelFunc(windows[v]), 1)
 		}
@@ -138,17 +140,20 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 		}
 
 		{
-			win := windows[snap.Active]
-			winLabel := labelFunc(win)
-			if lastActive != nil && lastActive.Label == winLabel {
-				lastActive.End = snap.Time
-			} else {
-				if lastActive != nil {
+			if win := windows[snap.Active]; win != nil {
+				winLabel := labelFunc(win)
+				if lastActive != nil && lastActive.Label == winLabel {
 					lastActive.End = snap.Time
+				} else {
+					if lastActive != nil {
+						lastActive.End = snap.Time
+					}
+					newRange := &Range{Label: winLabel, Start: snap.Time, End: snap.Time}
+					active = append(active, newRange)
+					lastActive = newRange
 				}
-				newRange := &Range{Label: winLabel, Start: snap.Time, End: snap.Time}
-				active = append(active, newRange)
-				lastActive = newRange
+			} else {
+				lastActive = nil
 			}
 		}
 
