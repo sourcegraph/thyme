@@ -44,7 +44,7 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
 
 ## Install
 
-1. [Install Go.](https://golang.org/dl/) (If you have Homebrew on macOS, you can also run `brew install go`.) and run
+1. [Install Go](https://golang.org/dl/) (if you have Homebrew on macOS, you can also run `brew install go`) and run
    ```
    $ go get -u github.com/sourcegraph/thyme/cmd/thyme
    ```
