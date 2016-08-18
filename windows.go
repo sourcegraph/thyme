@@ -9,6 +9,10 @@ import (
 	"unsafe"
 )
 
+func init() {
+	RegisterTracker("windows", NewWindowsTracker)
+}
+
 // WindowsTracker tracks application usage using the "EnumWindows" win32 API. Windows is very liberal
 // in what it calls a Window, so one Window (or application) may return multiple times with the same
 // process ID, but different window titles. Which title is used is a matter of chance.

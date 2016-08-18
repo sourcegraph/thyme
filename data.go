@@ -3,9 +3,30 @@ package thyme
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 )
+
+// trackers is the list of Tracker constructors that are available on this system. Tracker implementations should call
+// the RegisterTracker function to make themselves available.
+var trackers = make(map[string]func() Tracker)
+
+// RegisterTracker makes a Tracker constructor available to clients of this package.
+func RegisterTracker(name string, t func() Tracker) {
+	if _, exists := trackers[name]; exists {
+		log.Fatalf("a tracker already exists with the name %s", name)
+	}
+	trackers[name] = t
+}
+
+// NewTracker returns a new Tracker instance whose type is `name`.
+func NewTracker(name string) Tracker {
+	if _, exists := trackers[name]; !exists {
+		log.Fatalf("no Tracker constructor has been registered with name %s", name)
+	}
+	return trackers[name]()
+}
 
 // Tracker tracks application usage. An implementation that satisfies
 // this interface is required for each OS windowing system Thyme

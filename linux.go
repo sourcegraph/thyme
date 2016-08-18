@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+func init() {
+	RegisterTracker("linux", NewLinuxTracker)
+}
+
 // LinuxTracker tracks application usage on Linux via a few standard command-line utilities.
 type LinuxTracker struct{}
 

@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+func init() {
+	RegisterTracker("darwin", NewDarwinTracker)
+}
+
 // DarwinTracker tracks application usage using the "System Events" API in AppleScript. Due to the liminations of this
 // API, the DarwinTracker will not be able to detect individual windows of applications that are not scriptable (in the
 // AppleScript sense). For these applications, a single window is emitted with the name set to the application process

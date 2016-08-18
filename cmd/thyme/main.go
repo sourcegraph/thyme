@@ -153,9 +153,11 @@ func main() {
 
 func getTracker() (thyme.Tracker, error) {
 	switch runtime.GOOS {
+	case "windows":
+		return thyme.NewTracker("windows"), nil
 	case "darwin":
-		return thyme.NewDarwinTracker(), nil
+		return thyme.NewTracker("darwin"), nil
 	default:
-		return thyme.NewLinuxTracker(), nil
+		return thyme.NewTracker("linux"), nil
 	}
 }
