@@ -49,7 +49,10 @@ func (c *WatchCmd) Execute(args []string) error {
 
 	// Loop until the user aborts the command
 	for {
-		c.TrackCmd.Execute(args)
+		err := c.TrackCmd.Execute(args)
+		if err != nil {
+			return err
+		}
 
 		// Sleep for a while until the next time we should track active windows
 		time.Sleep(interval)
