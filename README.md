@@ -48,14 +48,16 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
 
 ## Install
 
-1. [Install Go.](https://golang.org/dl/) (If you have Homebrew on macOS, you can also run `brew install go`.)
-2. Run
+1. [Install Go.](https://golang.org/dl/) (If you have Homebrew on macOS, you can also run `brew install go`.) and run
 ```
 $ go get -u github.com/sourcegraph/thyme/cmd/thyme
+```
+Alternatively, if you don't want to install Go, just download the `thyme` binary [here](https://github.com/sourcegraph/thyme/releases).
+1. Follow the instructions printed by `thyme dep`.
+```
 $ thyme dep
 ```
-3. Follow the instructions printed by `thyme dep`.
-4. Verify `thyme` works with
+1. Verify `thyme` works with
 ```
 $ thyme track
 ```
