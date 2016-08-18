@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/sourcegraph/thyme"
@@ -17,11 +18,41 @@ func init() {
 	if _, err := CLI.AddCommand("track", "", "record current windows", &trackCmd); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := CLI.AddCommand("watch", "", "record current windows at regular intervals (default 30s)", &watchCmd); err != nil {
+		log.Fatal(err)
+	}
 	if _, err := CLI.AddCommand("show", "", "visualize data", &showCmd); err != nil {
 		log.Fatal(err)
 	}
-	if _, err := CLI.AddCommand("dep", "", "external dependencies that need to be installed", &depCmd); err != nil {
-		log.Fatal(err)
+}
+
+// WatchCmd is the subcommand that tracks application usage at regular intervals.
+type WatchCmd struct {
+	// The track command is a subset of the watch command
+	TrackCmd
+	Interval int64 `long:"interval" short:"n" description:"update interval (default 30 seconds)"`
+}
+
+var watchCmd WatchCmd
+
+func (c *WatchCmd) Execute(args []string) error {
+	var interval time.Duration
+	if c.Interval <= 0 {
+		// Set default interval
+		interval = 30 * time.Second
+	} else {
+		interval = time.Duration(c.Interval) * time.Second
+	}
+
+	// Loop until the user aborts the command
+	for {
+		err := c.TrackCmd.Execute(args)
+		if err != nil {
+			return err
+		}
+
+		// Sleep for a while until the next time we should track active windows
+		time.Sleep(interval)
 	}
 }
 
@@ -120,19 +151,6 @@ func (c *ShowCmd) Execute(args []string) error {
 			thyme.List(&stream)
 		}
 	}
-	return nil
-}
-
-type DepCmd struct{}
-
-var depCmd DepCmd
-
-func (c *DepCmd) Execute(args []string) error {
-	t, err := getTracker()
-	if err != nil {
-		return err
-	}
-	fmt.Println(t.Deps())
 	return nil
 }
 

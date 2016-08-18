@@ -2,6 +2,7 @@ package thyme
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -22,13 +23,26 @@ func NewLinuxTracker() Tracker {
 	return &LinuxTracker{}
 }
 
-func (t *LinuxTracker) Deps() string {
-	return `Install the following command-line utilities via your package manager (e.g., apt) of choice:
-* xdpyinfo
-* xwininfo
-* xdotool
-* wmctrl
-`
+func (t *LinuxTracker) CheckDependencies() {
+	deps := map[string]string{
+		"xdpyinfo": "x11-utils",
+		"xwininfo": "x11-utils",
+		"xdotool":  "xdotool",
+		"wmctrl":   "wmctrl",
+	}
+
+	anyFailed := false
+	for k, v := range deps {
+		_, err := exec.LookPath(k)
+		if err != nil {
+			fmt.Printf("You need to install the command line utility '%s' (usually in the package named '%s') via your package manager of choice.\nFor example 'apt-get install %s'\n\n", k, v, v)
+			anyFailed = true
+		}
+	}
+
+	if anyFailed {
+		os.Exit(1)
+	}
 }
 
 func (t *LinuxTracker) Snap() (*Snapshot, error) {

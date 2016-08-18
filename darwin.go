@@ -90,13 +90,11 @@ end repeat
 `
 )
 
-func (t *DarwinTracker) Deps() string {
-	return `
-You will need the osascript command-line utility. You can install it via the Apple developer tools ('xcode-select --install') or npm ('npm install --save osascript').
-
-You will need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
-See https://support.apple.com/en-us/HT202802 for details.
-`
+func (t *DarwinTracker) CheckDependencies() {
+	_, err := exec.LookPath("osascript")
+	if err != nil {
+		log.Fatal("You will need the osascript command-line utility. You can install it via the Apple developer tools ('xcode-select --install') or npm ('npm install --save osascript').")
+	}
 }
 
 func (t *DarwinTracker) Snap() (*Snapshot, error) {
@@ -186,7 +184,22 @@ func runAS(script string) (map[process][]*Window, error) {
 	cmd.Stdin = bytes.NewBuffer([]byte(script))
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("AppleScript error: %s, output was:\n%s", err, string(b))
+		// This is the error code for 'osascript is not allowed assistive access'.
+		// Add a more informative error message than the one applescript normally outputs.
+		if strings.Contains(string(b), "-25211") {
+			formatString := `
+AppleScript error: %s
+You will need to enable privileges for "Terminal" (or Iterm2 if you are using that) in
+System Preferences > Security & Privacy > Privacy > Accessibility.
+See https://support.apple.com/en-us/HT202802 for details.
+
+output was:
+%s`
+
+			return nil, fmt.Errorf(formatString, err, string(b))
+		} else {
+			return nil, fmt.Errorf("AppleScript error: %s, output was:\n%s", err, string(b))
+		}
 	}
 	return parseASOutput(string(b))
 }

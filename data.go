@@ -25,7 +25,9 @@ func NewTracker(name string) Tracker {
 	if _, exists := trackers[name]; !exists {
 		log.Fatalf("no Tracker constructor has been registered with name %s", name)
 	}
-	return trackers[name]()
+	tracker := trackers[name]()
+	tracker.CheckDependencies()
+	return tracker
 }
 
 // Tracker tracks application usage. An implementation that satisfies
@@ -36,9 +38,10 @@ type Tracker interface {
 	// at the current time.
 	Snap() (*Snapshot, error)
 
-	// Deps returns a string listing the dependencies that still need
-	// to be installed with instructions for how to install them.
-	Deps() string
+	// CheckDependencies checks for external dependencies (for example
+	// 'osascript' on OS X) and logs a fatal error if they are not available
+	// as well as instructions for how to install them.
+	CheckDependencies()
 }
 
 // Stream represents all the sampling data gathered by Thyme.
