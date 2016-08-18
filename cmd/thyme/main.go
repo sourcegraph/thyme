@@ -153,8 +153,6 @@ func main() {
 
 func getTracker() (thyme.Tracker, error) {
 	switch runtime.GOOS {
-	case "windows":
-		return thyme.NewWindowsTracker(), nil
 	case "darwin":
 		return thyme.NewDarwinTracker(), nil
 	default:
