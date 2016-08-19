@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const numberOfBars = 30
+const maxNumberOfBars = 30
 
 // Stats renders an HTML page with charts using stream as its data
 // source. Currently, it renders the following charts:
@@ -38,7 +38,7 @@ type AggTime struct {
 
 // NewAggTime returns a new AggTime created from a Stream.
 func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
-	n := strconv.Itoa(numberOfBars)
+	n := strconv.Itoa(maxNumberOfBars)
 	active := NewBarChart("Active", "App", "Samples", "Top "+n+" active applications by time (multiplied by window count)")
 	visible := NewBarChart("Visible", "App", "Samples", "Top "+n+" visible applications by time (multiplied by window count)")
 	all := NewBarChart("All", "App", "Samples", "Top "+n+" open applications by time (multiplied by window count)")
@@ -87,7 +87,7 @@ func (c *BarChart) Plus(label string, n int) {
 	c.Series[label] += n
 }
 
-// OrderedBars returns a list of the top $numberOfBars bars in the bar chart ordered by
+// OrderedBars returns a list of the top $maxNumberOfBars bars in the bar chart ordered by
 // decreasing count.
 func (c *BarChart) OrderedBars() []Bar {
 	var bars []Bar
@@ -96,6 +96,10 @@ func (c *BarChart) OrderedBars() []Bar {
 	}
 	s := sortBars{bars}
 	sort.Sort(s)
+	numberOfBars := maxNumberOfBars
+	if numberOfBars > len(s.bars) {
+		numberOfBars = len(s.bars)
+	}
 	return s.bars[:numberOfBars]
 }
 
