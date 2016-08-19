@@ -23,12 +23,41 @@ func NewLinuxTracker() Tracker {
 }
 
 func (t *LinuxTracker) Deps() string {
-	return `Install the following command-line utilities via your package manager (e.g., apt) of choice:
-* xdpyinfo
-* xwininfo
-* xdotool
-* wmctrl
-`
+	var output = "\r\nInstall these following command-line utilities via your package manager (e.g., apt) of choice:\r\n"
+	var depsRequired = false
+	if !verifyCommand("xdpyinfo") {
+		output += "\r\n* xdpyinfo"
+		depsRequired = true
+	}
+	if !verifyCommand("xwininfo") {
+		output += "\r\n* xwininfo"
+		depsRequired = true
+	}
+	if !verifyCommand("xdotool") {
+		output += "\r\n* xdotool"
+		depsRequired = true
+	}
+	if !verifyCommand("wmctrl") {
+		output += "\r\n* wmctrl"
+		depsRequired = true
+	}
+
+	if depsRequired {
+		output += "\r\n\r\nExample deb/apt install command: apt-get install x11-utils xdotool wmctrl"
+		output += "\r\nExample rpm/yum install command: yum install xorg-x11-utils xdotool wmctrl"
+		return output
+	} else {
+		return `All dependencies already installed.`
+	}
+}
+
+func verifyCommand(file string) bool {
+	var _, err = exec.LookPath(file)
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
 }
 
 func (t *LinuxTracker) Snap() (*Snapshot, error) {
