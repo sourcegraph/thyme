@@ -56,7 +56,7 @@ func getWindowTitle(window uintptr) string {
 // getWindowID returns the process (thread) id that created the window. Multiple windows can share
 // the same process id.
 func getWindowID(window uintptr) int64 {
-	id, _, _ := procGetWindowThreadProcessId.Call(window)
+	id, _, _ := procGetWindowThreadProcessId.Call(window, 0)
 	return int64(id)
 }
 
