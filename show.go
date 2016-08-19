@@ -35,9 +35,9 @@ type AggTime struct {
 
 // NewAggTime returns a new AggTime created from a Stream.
 func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
-	active := NewBarChart("Active", "App", "Samples", "Top 10 active applications by time (multiplied by window count)")
-	visible := NewBarChart("Visible", "App", "Samples", "Top 10 visible applications by time (multiplied by window count)")
-	all := NewBarChart("All", "App", "Samples", "Top 10 open applications by time (multiplied by window count)")
+	active := NewBarChart("Active", "App", "Samples", "Top 30 active applications by time (multiplied by window count)")
+	visible := NewBarChart("Visible", "App", "Samples", "Top 30 visible applications by time (multiplied by window count)")
+	all := NewBarChart("All", "App", "Samples", "Top 30 open applications by time (multiplied by window count)")
 	for _, snap := range stream.Snapshots {
 		windows := make(map[int64]*Window)
 		for _, win := range snap.Windows {
