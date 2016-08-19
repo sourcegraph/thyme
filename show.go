@@ -35,9 +35,9 @@ type AggTime struct {
 
 // NewAggTime returns a new AggTime created from a Stream.
 func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
-	active := NewBarChart("Active", "App", "Samples", "Time (multiplied by number of windows) application was active")
-	visible := NewBarChart("Visible", "App", "Samples", "Time (multiplied by number of windows) application was visible")
-	all := NewBarChart("All", "App", "Samples", "Time (multiplied by number of windows) application was open")
+	active := NewBarChart("Active", "App", "Samples", "Top 10 active applications by time (multiplied by window count)")
+	visible := NewBarChart("Visible", "App", "Samples", "Top 10 visible applications by time (multiplied by window count)")
+	all := NewBarChart("All", "App", "Samples", "Top 10 open applications by time (multiplied by window count)")
 	for _, snap := range stream.Snapshots {
 		windows := make(map[int64]*Window)
 		for _, win := range snap.Windows {
@@ -83,7 +83,7 @@ func (c *BarChart) Plus(label string, n int) {
 	c.Series[label] += n
 }
 
-// OrderedBars returns a list of bars in the bar chart ordered by
+// OrderedBars returns a list of 30 bars in the bar chart ordered by
 // decreasing count.
 func (c *BarChart) OrderedBars() []Bar {
 	var bars []Bar
@@ -92,7 +92,7 @@ func (c *BarChart) OrderedBars() []Bar {
 	}
 	s := sortBars{bars}
 	sort.Sort(s)
-	return s.bars
+	return s.bars[0:30]
 }
 
 type sortBars struct {
@@ -301,7 +301,8 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
         vAxis: {
           title: '{{$chart.XLabel}}'
         },
-        bars: 'horizontal'
+        bars: 'horizontal',
+        height: 600
       };
       var material = new google.charts.Bar(document.getElementById('bar_chart_{{$chart.ID}}'));
       material.draw(data, options);
