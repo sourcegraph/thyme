@@ -86,15 +86,15 @@ func (c *TrackCmd) Execute(args []string) error {
 
 // WatchCmd is the subcommand that tracks application usage on an interval
 type WatchCmd struct {
-	Out     string `long:"out" short:"o" description:"output file" default:"thyme.json"`
-	Seconds uint32 `long:"seconds" short:"s" description:"seconds between records" default:"30"`
+	Out      string `long:"out" short:"o" description:"output file" default:"thyme.json"`
+	Interval uint32 `long:"interval" short:"n" description:"seconds between records" default:"30"`
 }
 
 var watchCmd WatchCmd
 
 func (c *WatchCmd) Execute(args []string) error {
 	trackCmd.Out = c.Out
-	for range time.Tick(time.Duration(c.Seconds) * time.Second) {
+	for range time.Tick(time.Duration(c.Interval) * time.Second) {
 		err := trackCmd.Execute(args)
 		if err != nil {
 			return err
