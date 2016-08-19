@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var numberOfBars = 30
+const numberOfBars = 30
 
 // Stats renders an HTML page with charts using stream as its data
 // source. Currently, it renders the following charts:
@@ -39,9 +39,9 @@ type AggTime struct {
 // NewAggTime returns a new AggTime created from a Stream.
 func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
 	n := strconv.Itoa(numberOfBars)
-	active := NewBarChart("Active", "App", "Samples", "Top " + n + " active applications by time (multiplied by window count)")
-	visible := NewBarChart("Visible", "App", "Samples", "Top " + n + " visible applications by time (multiplied by window count)")
-	all := NewBarChart("All", "App", "Samples", "Top " + n + " open applications by time (multiplied by window count)")
+	active := NewBarChart("Active", "App", "Samples", "Top "+n+" active applications by time (multiplied by window count)")
+	visible := NewBarChart("Visible", "App", "Samples", "Top "+n+" visible applications by time (multiplied by window count)")
+	all := NewBarChart("All", "App", "Samples", "Top "+n+" open applications by time (multiplied by window count)")
 	for _, snap := range stream.Snapshots {
 		windows := make(map[int64]*Window)
 		for _, win := range snap.Windows {
