@@ -166,9 +166,8 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 		}
 		nextVisible := make(map[string]*Range)
 		for _, v := range snap.Visible {
-			win := windows[v]
 			var winLabel string
-			if win != nil {
+			if win := windows[v]; win != nil {
 				winLabel = labelFunc(win)
 			}
 			if existRng, exists := lastVisible[winLabel]; !exists {
@@ -393,7 +392,7 @@ var statsTmpl = template.Must(template.New("").Funcs(map[string]interface{}{
 // can't be determined, it returns the the name of the window.
 func appID(w *Window) string {
 	if w == nil {
-		return "(oops)"
+		return "(nil)"
 	}
 	if w.Info().App != "" {
 		return w.Info().App
