@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"runtime"
 	"time"
@@ -27,7 +28,18 @@ func init() {
 	if _, err := CLI.AddCommand("watch", "", "record current windows on an interval", &watchCmd); err != nil {
 		log.Fatal(err)
 	}
+	if _, err := CLI.AddGroup("shortcuts", "shortcuts for frequently used commands", &shortcutOptions); err != nil {
+		log.Fatal(err)
+	}
+	CLI.SubcommandsOptional = true
 }
+
+type ShortcutOptions struct {
+	Watch bool `long:"watch" short:"w" description:"sets up default watch"`
+	Show  bool `long:"show" short:"s" description:"sets up default show"`
+}
+
+var shortcutOptions ShortcutOptions
 
 // TrackCmd is the subcommand that tracks application usage.
 type TrackCmd struct {
@@ -94,6 +106,10 @@ var watchCmd WatchCmd
 
 func (c *WatchCmd) Execute(args []string) error {
 	trackCmd.Out = c.Out
+	err := trackCmd.Execute(args)
+	if err != nil {
+		return err
+	}
 	for range time.Tick(time.Duration(c.Interval) * time.Second) {
 		err := trackCmd.Execute(args)
 		if err != nil {
@@ -106,13 +122,48 @@ func (c *WatchCmd) Execute(args []string) error {
 // ShowCmd is the subcommand that reads the data emitted by the track
 // subcommand and displays the data to the user.
 type ShowCmd struct {
-	In   string `long:"in" short:"i" description:"input file"`
-	What string `long:"what" short:"w" description:"what to show {list,stats}" default:"list"`
+	In    string `long:"in" short:"i" description:"input file"`
+	What  string `long:"what" short:"w" description:"what to show {list,stats}" default:"list"`
+	Serve bool   `long:"serve" short:"s" description:"serves content via http"`
 }
 
 var showCmd ShowCmd
 
 func (c *ShowCmd) Execute(args []string) error {
+	if c.Serve {
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			f, err := os.Open(c.In)
+			if err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			defer f.Close()
+
+			var stream thyme.Stream
+			if err := json.NewDecoder(f).Decode(&stream); err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			thyme.Stats(w, &stream)
+		})
+		http.HandleFunc("/list", func(w http.ResponseWriter, r *http.Request) {
+			f, err := os.Open(c.In)
+			if err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			defer f.Close()
+
+			var stream thyme.Stream
+			if err := json.NewDecoder(f).Decode(&stream); err != nil {
+				fmt.Fprint(w, err)
+				return
+			}
+			thyme.List(w, &stream)
+		})
+		fmt.Println("Starting server...")
+		http.ListenAndServe(":6090", nil)
+	}
 	if c.In == "" {
 		var snap thyme.Snapshot
 		if err := json.NewDecoder(os.Stdin).Decode(&snap); err != nil {
@@ -134,13 +185,13 @@ func (c *ShowCmd) Execute(args []string) error {
 		}
 		switch c.What {
 		case "stats":
-			if err := thyme.Stats(&stream); err != nil {
+			if err := thyme.Stats(os.Stdout, &stream); err != nil {
 				return err
 			}
 		case "list":
 			fallthrough
 		default:
-			thyme.List(&stream)
+			thyme.List(os.Stdout, &stream)
 		}
 	}
 	return nil
@@ -165,11 +216,21 @@ func main() {
 		if err != nil {
 			return err
 		}
+		showOpt := CLI.FindOptionByLongName("show")
+		if showOpt != nil {
+			showCmd.In = watchCmd.Out
+			showCmd.What = "show"
+			showCmd.Serve = true
+			go showCmd.Execute([]string{})
+		}
+		opt := CLI.FindOptionByLongName("watch")
+		if opt != nil {
+			watchCmd.Execute([]string{})
+		}
 		return nil
 	}
 
 	if err := run(); err != nil {
-		log.Print(err)
 		os.Exit(1)
 	}
 }
