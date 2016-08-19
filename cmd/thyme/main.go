@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"time"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/sourcegraph/thyme"
@@ -21,6 +22,9 @@ func init() {
 		log.Fatal(err)
 	}
 	if _, err := CLI.AddCommand("dep", "", "external dependencies that need to be installed", &depCmd); err != nil {
+		log.Fatal(err)
+	}
+	if _, err := CLI.AddCommand("watch", "", "record current windows on an interval", &watchCmd); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -77,6 +81,25 @@ func (c *TrackCmd) Execute(args []string) error {
 		}
 	}
 
+	return nil
+}
+
+// WatchCmd is the subcommand that tracks application usage on an interval
+type WatchCmd struct {
+	Out     string `long:"out" short:"o" description:"output file" default:"thyme.json"`
+	Seconds uint32 `long:"seconds" short:"s" description:"seconds between records" default:"30"`
+}
+
+var watchCmd WatchCmd
+
+func (c *WatchCmd) Execute(args []string) error {
+	trackCmd.Out = c.Out
+	for range time.Tick(time.Duration(c.Seconds) * time.Second) {
+		err := trackCmd.Execute(args)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
