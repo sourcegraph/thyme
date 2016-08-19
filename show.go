@@ -83,7 +83,7 @@ func (c *BarChart) Plus(label string, n int) {
 	c.Series[label] += n
 }
 
-// OrderedBars returns a list of bars in the bar chart ordered by
+// OrderedBars returns a list of the largest 10 bars in the bar chart ordered by
 // decreasing count.
 func (c *BarChart) OrderedBars() []Bar {
 	var bars []Bar
@@ -92,7 +92,7 @@ func (c *BarChart) OrderedBars() []Bar {
 	}
 	s := sortBars{bars}
 	sort.Sort(s)
-	return s.bars
+	return s.bars[:10]
 }
 
 type sortBars struct {
