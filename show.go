@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"text/template"
 	"time"
 )
+
+var numberOfBars = 30
 
 // Stats renders an HTML page with charts using stream as its data
 // source. Currently, it renders the following charts:
@@ -35,9 +38,10 @@ type AggTime struct {
 
 // NewAggTime returns a new AggTime created from a Stream.
 func NewAggTime(stream *Stream, labelFunc func(*Window) string) *AggTime {
-	active := NewBarChart("Active", "App", "Samples", "Top 30 active applications by time (multiplied by window count)")
-	visible := NewBarChart("Visible", "App", "Samples", "Top 30 visible applications by time (multiplied by window count)")
-	all := NewBarChart("All", "App", "Samples", "Top 30 open applications by time (multiplied by window count)")
+	n := strconv.Itoa(numberOfBars)
+	active := NewBarChart("Active", "App", "Samples", "Top " + n + " active applications by time (multiplied by window count)")
+	visible := NewBarChart("Visible", "App", "Samples", "Top " + n + " visible applications by time (multiplied by window count)")
+	all := NewBarChart("All", "App", "Samples", "Top " + n + " open applications by time (multiplied by window count)")
 	for _, snap := range stream.Snapshots {
 		windows := make(map[int64]*Window)
 		for _, win := range snap.Windows {
@@ -83,7 +87,7 @@ func (c *BarChart) Plus(label string, n int) {
 	c.Series[label] += n
 }
 
-// OrderedBars returns a list of 30 bars in the bar chart ordered by
+// OrderedBars returns a list of the top $numberOfBars bars in the bar chart ordered by
 // decreasing count.
 func (c *BarChart) OrderedBars() []Bar {
 	var bars []Bar
@@ -92,7 +96,7 @@ func (c *BarChart) OrderedBars() []Bar {
 	}
 	s := sortBars{bars}
 	sort.Sort(s)
-	return s.bars[0:30]
+	return s.bars[:numberOfBars]
 }
 
 type sortBars struct {
