@@ -96,7 +96,11 @@ func (c *BarChart) OrderedBars() []Bar {
 	}
 	s := sortBars{bars}
 	sort.Sort(s)
-	return s.bars[:numberOfBars]
+	barCount := numberOfBars
+	if len(bars) < barCount {
+		barCount = len(bars)
+	}
+	return s.bars[:barCount]
 }
 
 type sortBars struct {
