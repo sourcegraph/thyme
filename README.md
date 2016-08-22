@@ -1,7 +1,9 @@
 # <img alt="logo" src="/assets/images/thyme.png" height="40"> Thyme
 
-Spice up your day-to-day productivity with some free Thyme, courtesy of the team at [Sourcegraph](https://sourcegraph.com). Automatically track
-which applications you use and for how long.
+Spice up your day-to-day productivity with some free Thyme, courtesy
+of the team at [Sourcegraph](https://sourcegraph.com) (the
+[best way to read and explore code](https://sourcegraph.com/github.com/sourcegraph/thyme/-/def/GoPackage/github.com/sourcegraph/thyme/-/Snapshot)).
+Automatically track which applications you use and for how long.
 
 - Simple CLI to track and analyze your application usage
 - Detailed charts that let you profile how you spend your time
