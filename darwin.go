@@ -94,6 +94,7 @@ func (t *DarwinTracker) Deps() string {
 	return `
 You will need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
 See https://support.apple.com/en-us/HT202802 for details.
+If you've done it, this command does nothing.
 `
 }
 
