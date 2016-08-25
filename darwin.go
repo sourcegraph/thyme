@@ -3,6 +3,7 @@ package thyme
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"log"
 	"os/exec"
 	"strconv"
@@ -94,6 +95,8 @@ func (t *DarwinTracker) Deps() string {
 	return `
 You will need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
 See https://support.apple.com/en-us/HT202802 for details.
+
+Note: this command prints out this message regardless of whether this has been done or not.
 `
 }
 
@@ -203,16 +206,36 @@ func parseASOutput(out string) (map[process][]*Window, error) {
 			proc = process{line[c+1:], procID}
 			procWins[proc] = nil
 		} else if strings.HasPrefix(line, "WINDOW ") {
-			c := strings.Index(line, ":")
-			win := line[c+1:]
-			winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
-			if err != nil {
-				return nil, err
-			}
+			win, winID := parseWindowLine(line, proc.id)
 			procWins[proc] = append(procWins[proc],
 				&Window{ID: winID, Name: fmt.Sprintf("%s - %s", win, proc.name)},
 			)
 		}
 	}
 	return procWins, nil
+}
+
+// parseWindowLine parses window ID from a line of the AppleScript
+// output. If the ID is missing ("missing value"), parseWindowLine
+// will return the hash of the window title and process ID. Note: if 2
+// windows controlled by the same process both have IDs missing and
+// have the same title, they will hash to the same ID. This is
+// unfortunate but seems to be the best behavior.
+func parseWindowLine(line string, procId int64) (string, int64) {
+	c := strings.Index(line, ":")
+	win := line[c+1:]
+	winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
+	if err != nil {
+		// sometimes "missing value" appears here, so generate a value
+		// taking the process ID and the window index to generate a hash
+		winID = hash(fmt.Sprintf("%s%v", win, procId))
+	}
+	return win, winID
+}
+
+// hash converts a string to an integer hash
+func hash(s string) int64 {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return int64(h.Sum32())
 }

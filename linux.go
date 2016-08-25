@@ -31,6 +31,8 @@ func (t *LinuxTracker) Deps() string {
 
 For example:
 * Debian: apt-get install x11-utils xdotool wmctrl
+
+Note: this command prints out this message regardless of whether this has been done or not.
 `
 }
 
