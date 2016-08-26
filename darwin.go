@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"hash/fnv"
 )
 
 func init() {
@@ -94,10 +95,12 @@ func (t *DarwinTracker) Deps() string {
 	return `
 You will need to enable privileges for "Terminal" in System Preferences > Security & Privacy > Privacy > Accessibility.
 See https://support.apple.com/en-us/HT202802 for details.
+If you've done it, this command does nothing.
 `
 }
 
 func (t *DarwinTracker) Snap() (*Snapshot, error) {
+
 	var allWindows []*Window
 	var allProcWins map[process][]*Window
 	{
@@ -203,16 +206,32 @@ func parseASOutput(out string) (map[process][]*Window, error) {
 			proc = process{line[c+1:], procID}
 			procWins[proc] = nil
 		} else if strings.HasPrefix(line, "WINDOW ") {
-			c := strings.Index(line, ":")
-			win := line[c+1:]
-			winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
-			if err != nil {
-				return nil, err
-			}
+			win, winID := parseWindow(line, proc.id, len(procWins[proc]))
 			procWins[proc] = append(procWins[proc],
 				&Window{ID: winID, Name: fmt.Sprintf("%s - %s", win, proc.name)},
 			)
 		}
 	}
 	return procWins, nil
+}
+
+// parses window id or generates it if missing making sure that window is is unique
+func parseWindow(line string, procId int64, windowIdx int) (string, int64){
+	// [OSX] ParseInt: "missing value" error #9
+	c := strings.Index(line, ":")
+	win := line[c+1:]
+	winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
+	if err != nil {
+		// sometimes "missing value" appears here, so generate a value
+		// taking the process id and the window index to generate a hash
+		winID = hash(fmt.Sprintf("%s%v%v", win, procId, windowIdx))
+	}
+	return win, winID
+}
+
+// string to hash
+func hash(s string) int64 {
+        h := fnv.New32a()
+        h.Write([]byte(s))
+        return int64(h.Sum32())
 }
