@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"hash/fnv"
 )
 
 func init() {
@@ -99,6 +100,7 @@ If you've done it, this command does nothing.
 }
 
 func (t *DarwinTracker) Snap() (*Snapshot, error) {
+
 	var allWindows []*Window
 	var allProcWins map[process][]*Window
 	{
@@ -204,16 +206,31 @@ func parseASOutput(out string) (map[process][]*Window, error) {
 			proc = process{line[c+1:], procID}
 			procWins[proc] = nil
 		} else if strings.HasPrefix(line, "WINDOW ") {
-			c := strings.Index(line, ":")
-			win := line[c+1:]
-			winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
-			if err != nil {
-				return nil, err
-			}
+			win, winID := parseWindow(line)
 			procWins[proc] = append(procWins[proc],
 				&Window{ID: winID, Name: fmt.Sprintf("%s - %s", win, proc.name)},
 			)
 		}
 	}
 	return procWins, nil
+}
+
+// parses window id or generates it if missing
+func parseWindow(line string) (string, int64){
+	// [OSX] ParseInt: "missing value" error #9
+	c := strings.Index(line, ":")
+	win := line[c+1:]
+	winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
+	if err != nil {
+		// sometimes "missing value" appears here, so generate a value
+		winID = hash(win)
+	}
+	return win, winID
+}
+
+// string to hash
+func hash(s string) int64 {
+        h := fnv.New32a()
+        h.Write([]byte(s))
+        return int64(h.Sum32())
 }
