@@ -206,7 +206,7 @@ func parseASOutput(out string) (map[process][]*Window, error) {
 			proc = process{line[c+1:], procID}
 			procWins[proc] = nil
 		} else if strings.HasPrefix(line, "WINDOW ") {
-			win, winID := parseWindow(line)
+			win, winID := parseWindow(line, proc.id, len(procWins[proc]))
 			procWins[proc] = append(procWins[proc],
 				&Window{ID: winID, Name: fmt.Sprintf("%s - %s", win, proc.name)},
 			)
@@ -215,15 +215,16 @@ func parseASOutput(out string) (map[process][]*Window, error) {
 	return procWins, nil
 }
 
-// parses window id or generates it if missing
-func parseWindow(line string) (string, int64){
+// parses window id or generates it if missing making sure that window is is unique
+func parseWindow(line string, procId int64, windowIdx int) (string, int64){
 	// [OSX] ParseInt: "missing value" error #9
 	c := strings.Index(line, ":")
 	win := line[c+1:]
 	winID, err := strconv.ParseInt(line[len("WINDOW "):c], 10, 0)
 	if err != nil {
 		// sometimes "missing value" appears here, so generate a value
-		winID = hash(win)
+		// taking the process id and the window index to generate a hash
+		winID = hash(fmt.Sprintf("%s%v%v", win, procId, windowIdx))
 	}
 	return win, winID
 }
