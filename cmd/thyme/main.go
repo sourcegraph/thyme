@@ -14,13 +14,31 @@ import (
 var CLI = flags.NewNamedParser("thyme", flags.PrintErrors|flags.PassDoubleDash)
 
 func init() {
-	if _, err := CLI.AddCommand("track", "", "record current windows", &trackCmd); err != nil {
+	CLI.Usage = `
+thyme - automatically track which applications you use and for how long.
+
+  \|//   thyme is a simple time tracker that tracks active window names and collects
+ W Y/    statistics over active, open, and visible windows. Statistics are collected
+  \|  ,  into a local JSON file, which is used to generate a pretty HTML report.
+   \_/
+    \
+     \_  thyme is a local CLI tool and does not send any data over the network.
+
+Example usage:
+
+  thyme dep
+  thyme track -o <file>
+  thyme show  -i <file> -w stats > viz.html
+
+`
+
+	if _, err := CLI.AddCommand("track", "record current windows", "Record current window metadata as JSON printed to stdout or a file. If a filename is specified and the file already exists, Thyme will append the new snapshot data to the existing data.", &trackCmd); err != nil {
 		log.Fatal(err)
 	}
-	if _, err := CLI.AddCommand("show", "", "visualize data", &showCmd); err != nil {
+	if _, err := CLI.AddCommand("show", "visualize data", "Generate an HTML page visualizing the data from a file written to by `thyme track`.", &showCmd); err != nil {
 		log.Fatal(err)
 	}
-	if _, err := CLI.AddCommand("dep", "", "external dependencies that need to be installed", &depCmd); err != nil {
+	if _, err := CLI.AddCommand("dep", "dep install instructions", "Show installation instructions for required external dependencies (which vary depending on your OS and windowing system).", &depCmd); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -140,7 +158,12 @@ func main() {
 	run := func() error {
 		_, err := CLI.Parse()
 		if err != nil {
-			return err
+			if _, isFlagsErr := err.(*flags.Error); isFlagsErr {
+				CLI.WriteHelp(os.Stderr)
+				return nil
+			} else {
+				return err
+			}
 		}
 		return nil
 	}
