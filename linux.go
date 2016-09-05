@@ -23,7 +23,8 @@ func NewLinuxTracker() Tracker {
 }
 
 func (t *LinuxTracker) Deps() string {
-	return `Install the following command-line utilities via your package manager of choice:
+	return `
+Install the following command-line utilities via your package manager of choice:
 * xdpyinfo
 * xwininfo
 * xdotool
@@ -32,7 +33,7 @@ func (t *LinuxTracker) Deps() string {
 For example:
 * Debian: apt-get install x11-utils xdotool wmctrl
 
-Note: this command prints out this message regardless of whether this has been done or not.
+Note: this command prints out this message regardless of whether the dependencies are already installed.
 `
 }
 
