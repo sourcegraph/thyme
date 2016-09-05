@@ -44,6 +44,10 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
 ![Application usage timeline](/assets/images/agg.png)
 
 
+## Dependencies
+
+Thyme's dependencies vary by system. See `thyme dep` (mentioned in the installation instructions below).
+
 ## Install
 
 1. [Install Go](https://golang.org/dl/) (if you have Homebrew on macOS, you can also run `brew install go`) and run
