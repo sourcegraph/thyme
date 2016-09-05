@@ -3,36 +3,61 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 
-	"github.com/jessevdk/go-flags"
+	"github.com/kovetskiy/godocs"
 	"github.com/sourcegraph/thyme"
 )
 
-var CLI = flags.NewNamedParser("thyme", flags.PrintErrors|flags.PassDoubleDash)
+var version = "[manual build]"
 
-func init() {
-	if _, err := CLI.AddCommand("track", "", "record current windows", &trackCmd); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := CLI.AddCommand("show", "", "visualize data", &showCmd); err != nil {
-		log.Fatal(err)
-	}
-	if _, err := CLI.AddCommand("dep", "", "external dependencies that need to be installed", &depCmd); err != nil {
-		log.Fatal(err)
-	}
-}
+var usage = `thyme - automatically track which applications you use and for how long.
+
+  \|//   thyme is simple time tracker, which tracks active window names and
+ W Y/    collect statistics over active, open and visible windows. Statistics
+  \|  ,  is collected into local JSON file, which can be transformed
+   \_/   into pretty HTML report.
+    \
+     \_  thyme is a local CLI tool and do not send any info over network.
+
+Usage:
+  thyme track -o <file>
+  thyme show  -i <file> -w <what>
+  thyme dep
+  thyme -h | --help
+
+Commands:
+  track               Will track current windows state into new record inside
+                       specified JSON file.
+
+  show                Will show computed applications usage based on collected
+                       statistics.
+
+  dep                 Show miscallaneous installation info.
+
+Options:
+  -h --help           Show this help.
+  -v --version        Show program version. Will be equal to '[manual build]' if
+                       tool is built via go get without package manager.
+
+Track options:
+  -o --output <file>  Specify JSON file to collect statistics into.
+
+Show options:
+  -i --input <file>   Specify JSON file to read statistic into.
+  -w --what <what>    Display specified statistics. Can be either
+                       'list' (will output plaintext) or
+                       'stats' (will output HTML).
+                       [default: list]
+`
 
 // TrackCmd is the subcommand that tracks application usage.
 type TrackCmd struct {
-	Out string `long:"out" short:"o" description:"output file"`
+	Out string
 }
 
-var trackCmd TrackCmd
-
-func (c *TrackCmd) Execute(args []string) error {
+func (c TrackCmd) Execute() error {
 	t, err := getTracker()
 	if err != nil {
 		return err
@@ -83,13 +108,11 @@ func (c *TrackCmd) Execute(args []string) error {
 // ShowCmd is the subcommand that reads the data emitted by the track
 // subcommand and displays the data to the user.
 type ShowCmd struct {
-	In   string `long:"in" short:"i" description:"input file"`
-	What string `long:"what" short:"w" description:"what to show {list,stats}" default:"list"`
+	In   string
+	What string
 }
 
-var showCmd ShowCmd
-
-func (c *ShowCmd) Execute(args []string) error {
+func (c ShowCmd) Execute() error {
 	if c.In == "" {
 		var snap thyme.Snapshot
 		if err := json.NewDecoder(os.Stdin).Decode(&snap); err != nil {
@@ -125,9 +148,7 @@ func (c *ShowCmd) Execute(args []string) error {
 
 type DepCmd struct{}
 
-var depCmd DepCmd
-
-func (c *DepCmd) Execute(args []string) error {
+func (c DepCmd) Execute() error {
 	t, err := getTracker()
 	if err != nil {
 		return err
@@ -137,16 +158,30 @@ func (c *DepCmd) Execute(args []string) error {
 }
 
 func main() {
-	run := func() error {
-		_, err := CLI.Parse()
-		if err != nil {
-			return err
-		}
-		return nil
+	args, err := godocs.Parse(usage, "thyme "+version, godocs.UsePager)
+	if err != nil {
+		panic(err)
 	}
 
-	if err := run(); err != nil {
-		log.Print(err)
+	switch {
+	case args["track"].(bool):
+		err = TrackCmd{
+			Out: args["--output"].(string),
+		}.Execute()
+
+	case args["show"].(bool):
+		err = ShowCmd{
+			In:   args["--input"].(string),
+			What: args["--what"].(string),
+		}.Execute()
+
+	case args["dep"].(bool):
+		err = DepCmd{}.Execute()
+	}
+
+	if err != nil {
+		fmt.Println(err)
+
 		os.Exit(1)
 	}
 }
