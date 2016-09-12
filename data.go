@@ -155,32 +155,41 @@ func (w *Window) IsOnDesktop(desktop int64) bool {
 	return w.IsSticky() || w.Desktop == desktop
 }
 
+const WindowTitleSeparator = " - "
+
 // Info returns more structured metadata about a window. The metadata
 // is extracted using heuristics.
+//
+// Assumptions:
+//     1) Most windows use " - " to separate their window names from their content
+//     2) Most windows use the " - " with the application name at the end.
+//     3) The few programs that reverse this convention only reverse it.
 func (w *Window) Info() *Winfo {
-	fields := strings.Split(w.Name, " - ")
-	first := strings.TrimSpace(fields[0])
-	last := strings.TrimSpace(fields[len(fields)-1])
-	if last == "Google Chrome" {
-		if len(fields) > 1 {
+	fields := strings.Split(w.Name, WindowTitleSeparator)
+	if len(fields) > 1 {
+		first := strings.TrimSpace(fields[0])
+		last := strings.TrimSpace(fields[len(fields)-1])
+		// Special Cases
+		if last == "Google Chrome" {
 			return &Winfo{
 				App:    "Google Chrome",
 				SubApp: strings.TrimSpace(fields[len(fields)-2]),
-				Title:  strings.Join(fields[0:len(fields)-2], " - "),
+				Title:  strings.Join(fields[0:len(fields)-2], WindowTitleSeparator),
 			}
-		} else {
+		} else if first == "Slack" {
 			return &Winfo{
-				App:    "Google Chrome",
-				SubApp: "",
-				Title:  "",
+				App:    "Slack",
+				SubApp: strings.TrimSpace(strings.Join(fields[1:], WindowTitleSeparator)),
 			}
 		}
-	} else if first == "Slack" {
+
+		// Default Case
 		return &Winfo{
-			App:    "Slack",
-			SubApp: strings.TrimSpace(strings.Join(fields[1:], " - ")),
+			App:   last,
+			Title: strings.Join(fields[:len(fields)-1], WindowTitleSeparator),
 		}
 	}
+
 	return &Winfo{
 		Title: w.Name,
 	}
