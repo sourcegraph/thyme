@@ -156,6 +156,7 @@ func (w *Window) IsOnDesktop(desktop int64) bool {
 }
 
 const DefaultWindowTitleSeparator = " - "
+const MicrosoftEdgeWindowTitleSeparator = "\u200e- "
 
 // Info returns more structured metadata about a window. The metadata
 // is extracted using heuristics.
@@ -175,6 +176,16 @@ func (w *Window) Info() *Winfo {
 				SubApp: strings.TrimSpace(fields[len(fields)-2]),
 				Title:  strings.Join(fields[0:len(fields)-2], DefaultWindowTitleSeparator),
 			}
+		}
+	}
+
+	if strings.Contains(w.Name, MicrosoftEdgeWindowTitleSeparator) {
+		// App Name Last
+		beforeSep := strings.LastIndex(w.Name, MicrosoftEdgeWindowTitleSeparator)
+		afterSep := beforeSep + len(MicrosoftEdgeWindowTitleSeparator)
+		return &Winfo{
+			App:   strings.TrimSpace(w.Name[afterSep:]),
+			Title: strings.TrimSpace(w.Name[:beforeSep]),
 		}
 	}
 
