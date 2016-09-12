@@ -69,6 +69,18 @@ Thyme's dependencies vary by system. See `thyme dep` (mentioned in the installat
 
 Thyme currently supports Linux, macOS, and Windows.
 
+## Usage for Other Shells
+##### Windows Powershell
+   ```
+   > for(1){thyme track -o thyme.json; Start-Sleep -s 5}
+   > thyme show -i thyme.json -w stats | Out-File -e utf8 thyme.html
+   ```
+##### Windows DOS Command Line
+   ```
+   > for /L %n in (0) do @(thyme track -o thyme.json && timeout /t 5 /nobreak)
+   > thyme show -i thyme.json -w stats > thyme.html
+   ```
+
 ## Use cases
 
 Thyme was designed for developers who want to investigate their
