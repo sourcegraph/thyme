@@ -155,7 +155,7 @@ func (w *Window) IsOnDesktop(desktop int64) bool {
 	return w.IsSticky() || w.Desktop == desktop
 }
 
-const WindowTitleSeparator = " - "
+const DefaultWindowTitleSeparator = " - "
 
 // Info returns more structured metadata about a window. The metadata
 // is extracted using heuristics.
@@ -165,31 +165,40 @@ const WindowTitleSeparator = " - "
 //     2) Most windows use the " - " with the application name at the end.
 //     3) The few programs that reverse this convention only reverse it.
 func (w *Window) Info() *Winfo {
-	fields := strings.Split(w.Name, WindowTitleSeparator)
+	// Special Cases
+	fields := strings.Split(w.Name, DefaultWindowTitleSeparator)
 	if len(fields) > 1 {
-		first := strings.TrimSpace(fields[0])
 		last := strings.TrimSpace(fields[len(fields)-1])
-		// Special Cases
 		if last == "Google Chrome" {
 			return &Winfo{
 				App:    "Google Chrome",
 				SubApp: strings.TrimSpace(fields[len(fields)-2]),
-				Title:  strings.Join(fields[0:len(fields)-2], WindowTitleSeparator),
+				Title:  strings.Join(fields[0:len(fields)-2], DefaultWindowTitleSeparator),
 			}
-		} else if first == "Slack" {
-			return &Winfo{
-				App:    "Slack",
-				SubApp: strings.TrimSpace(strings.Join(fields[1:], WindowTitleSeparator)),
-			}
-		}
-
-		// Default Case
-		return &Winfo{
-			App:   last,
-			Title: strings.Join(fields[:len(fields)-1], WindowTitleSeparator),
 		}
 	}
 
+	// Normal Cases
+	if beforeSep := strings.Index(w.Name, DefaultWindowTitleSeparator); beforeSep > -1 {
+		// App Name First
+		if w.Name[:beforeSep] == "Slack" {
+			afterSep := beforeSep + len(DefaultWindowTitleSeparator)
+			return &Winfo{
+				App:   strings.TrimSpace(w.Name[:beforeSep]),
+				Title: strings.TrimSpace(w.Name[afterSep:]),
+			}
+		}
+
+		// App Name Last
+		beforeSep := strings.LastIndex(w.Name, DefaultWindowTitleSeparator)
+		afterSep := beforeSep + len(DefaultWindowTitleSeparator)
+		return &Winfo{
+			App:   strings.TrimSpace(w.Name[afterSep:]),
+			Title: strings.TrimSpace(w.Name[:beforeSep]),
+		}
+	}
+
+	// No Application name separator
 	return &Winfo{
 		Title: w.Name,
 	}
