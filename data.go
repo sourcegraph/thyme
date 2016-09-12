@@ -155,32 +155,63 @@ func (w *Window) IsOnDesktop(desktop int64) bool {
 	return w.IsSticky() || w.Desktop == desktop
 }
 
+const (
+	defaultWindowTitleSeparator       = " - "
+	microsoftEdgeWindowTitleSeparator = "\u200e- "
+)
+
 // Info returns more structured metadata about a window. The metadata
 // is extracted using heuristics.
+//
+// Assumptions:
+//     1) Most windows use " - " to separate their window names from their content
+//     2) Most windows use the " - " with the application name at the end.
+//     3) The few programs that reverse this convention only reverse it.
 func (w *Window) Info() *Winfo {
-	fields := strings.Split(w.Name, " - ")
-	first := strings.TrimSpace(fields[0])
-	last := strings.TrimSpace(fields[len(fields)-1])
-	if last == "Google Chrome" {
-		if len(fields) > 1 {
+	// Special Cases
+	fields := strings.Split(w.Name, defaultWindowTitleSeparator)
+	if len(fields) > 1 {
+		last := strings.TrimSpace(fields[len(fields)-1])
+		if last == "Google Chrome" {
 			return &Winfo{
 				App:    "Google Chrome",
 				SubApp: strings.TrimSpace(fields[len(fields)-2]),
-				Title:  strings.Join(fields[0:len(fields)-2], " - "),
+				Title:  strings.Join(fields[0:len(fields)-2], defaultWindowTitleSeparator),
 			}
-		} else {
-			return &Winfo{
-				App:    "Google Chrome",
-				SubApp: "",
-				Title:  "",
-			}
-		}
-	} else if first == "Slack" {
-		return &Winfo{
-			App:    "Slack",
-			SubApp: strings.TrimSpace(strings.Join(fields[1:], " - ")),
 		}
 	}
+
+	if strings.Contains(w.Name, microsoftEdgeWindowTitleSeparator) {
+		// App Name Last
+		beforeSep := strings.LastIndex(w.Name, microsoftEdgeWindowTitleSeparator)
+		afterSep := beforeSep + len(microsoftEdgeWindowTitleSeparator)
+		return &Winfo{
+			App:   strings.TrimSpace(w.Name[afterSep:]),
+			Title: strings.TrimSpace(w.Name[:beforeSep]),
+		}
+	}
+
+	// Normal Cases
+	if beforeSep := strings.Index(w.Name, defaultWindowTitleSeparator); beforeSep > -1 {
+		// App Name First
+		if w.Name[:beforeSep] == "Slack" {
+			afterSep := beforeSep + len(defaultWindowTitleSeparator)
+			return &Winfo{
+				App:   strings.TrimSpace(w.Name[:beforeSep]),
+				Title: strings.TrimSpace(w.Name[afterSep:]),
+			}
+		}
+
+		// App Name Last
+		beforeSep := strings.LastIndex(w.Name, defaultWindowTitleSeparator)
+		afterSep := beforeSep + len(defaultWindowTitleSeparator)
+		return &Winfo{
+			App:   strings.TrimSpace(w.Name[afterSep:]),
+			Title: strings.TrimSpace(w.Name[:beforeSep]),
+		}
+	}
+
+	// No Application name separator
 	return &Winfo{
 		Title: w.Name,
 	}
