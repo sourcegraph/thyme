@@ -42,7 +42,7 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 	{
 		out, err := exec.Command("bash", "-c", "xdpyinfo | grep dimensions").Output()
 		if err != nil {
-			return nil, fmt.Errorf("xdpyinfo failed with error: %s. Try running `xdpyinfo | grep dimensions` to diagnose.", err)
+			return nil, fmt.Errorf("xdpyinfo failed with error: %s. Try running `xdpyinfo | grep dimensions` to diagnose", err)
 		}
 		matches := dimRx.FindStringSubmatch(string(out))
 		if len(matches) != 3 {
@@ -63,7 +63,7 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 	{
 		out, err := exec.Command("wmctrl", "-l").Output()
 		if err != nil {
-			return nil, fmt.Errorf("wmctrl failed with error: %s. Try running `wmctrl -l` to diagnose.", err)
+			return nil, fmt.Errorf("wmctrl failed with error: %s. Try running `wmctrl -l` to diagnose", err)
 		}
 		lines := strings.Split(string(out), "\n")
 		for _, line := range lines {
@@ -144,7 +144,7 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 	{
 		out, err := exec.Command("xdotool", "getactivewindow").Output()
 		if err != nil {
-			return nil, fmt.Errorf("xdotool failed with error: %s. Try running `xdotool getactivewindow` to diagnose.", err)
+			return nil, fmt.Errorf("xdotool failed with error: %s. Try running `xdotool getactivewindow` to diagnose", err)
 		}
 		id, err := strconv.ParseInt(strings.TrimSpace(string(out)), 10, 64)
 		if err != nil {

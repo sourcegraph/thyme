@@ -187,7 +187,7 @@ func runAS(script string) (map[process][]*Window, error) {
 	cmd.Stdin = bytes.NewBuffer([]byte(script))
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("AppleScript error: %s, output was:\n%s", err, string(b))
+		return nil, fmt.Errorf("appleScript error: %s, output was:\n%s", err, string(b))
 	}
 	return parseASOutput(string(b))
 }
