@@ -122,7 +122,7 @@ type Window struct {
 	Name string
 }
 
-// systemNames is a set of blacklisted window names that are known to
+// systemNames is a set of excluded window names that are known to
 // be used by system windows that aren't visible to the user.
 var systemNames = map[string]struct{}{
 	"XdndCollectionWindowImp": {},
