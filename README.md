@@ -20,12 +20,12 @@ Want to share what you've learned about your Thyme? Join the discussion on [Twit
 
 1. Record which applications you use every 30 seconds:
    ```
-   $ while true; do thyme track -o thyme.json; sleep 30s; done;
+   $ while true; do ./thyme track -o thyme.json; sleep 30s; done;
    ```
 
 2. Create charts showing application usage over time. In a new window:
    ```
-   $ thyme show -i thyme.json -w stats > thyme.html
+   $ ./thyme show -i thyme.json -w stats > thyme.html
    ```
 
 3. Open `thyme.html` in your browser of choice to see the charts
