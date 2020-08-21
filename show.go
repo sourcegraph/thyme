@@ -150,7 +150,7 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 		{
 			if win := windows[snap.Active]; win != nil {
 				winLabel := labelFunc(win)
-				if lastActive != nil && lastActive.Label == winLabel && snap.Time.Sub(lastActive.Start).Minutes() < 5 {
+				if lastActive != nil && lastActive.Label == winLabel {
 					lastActive.End = snap.Time
 				} else {
 					if lastActive != nil && snap.Time.Sub(lastActive.Start).Minutes() < 5 {
