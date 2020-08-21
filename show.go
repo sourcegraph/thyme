@@ -153,7 +153,7 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 				if lastActive != nil && lastActive.Label == winLabel {
 					lastActive.End = snap.Time
 				} else {
-					if lastActive != nil {
+					if lastActive != nil && snap.Time.Sub(lastActive.Start).Minutes() < 5 {
 						lastActive.End = snap.Time
 					}
 					newRange := &Range{Label: winLabel, Start: snap.Time, End: snap.Time}
@@ -166,7 +166,9 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 		}
 
 		for _, prevRange := range lastVisible {
-			prevRange.End = snap.Time
+			if snap.Time.Sub(prevRange.Start).Minutes() < 5 {
+				prevRange.End = snap.Time
+			}
 		}
 		nextVisible := make(map[string]*Range)
 		for _, v := range snap.Visible {
@@ -185,7 +187,9 @@ func NewTimeline(stream *Stream, labelFunc func(*Window) string) *Timeline {
 		lastVisible = nextVisible
 
 		for _, prevRange := range lastOther {
-			prevRange.End = snap.Time
+			if snap.Time.Sub(prevRange.Start).Minutes() < 5 {
+				prevRange.End = snap.Time
+			}
 		}
 		nextOther := make(map[string]*Range)
 		for _, win := range snap.Windows {
