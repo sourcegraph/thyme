@@ -1,7 +1,10 @@
 package thyme
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
-func List(stream *Stream) {
-	fmt.Printf("%s", stream.Print())
+func List(w io.Writer, stream *Stream) {
+	fmt.Fprintf(w, "%s", stream.Print())
 }
