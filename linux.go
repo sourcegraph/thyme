@@ -113,7 +113,7 @@ func (t *LinuxTracker) Snap() (*Snapshot, error) {
 	var visible []int64
 	{
 		for _, window := range windows {
-			out_, err := exec.Command("xwininfo", "-id", fmt.Sprintf("%d", window.ID), "-stats").Output()
+			out_, err := exec.Command("xwininfo", "-id", strconv.Itoa(window.ID), "-stats").Output()
 			if err != nil {
 				return nil, fmt.Errorf("xwininfo failed with error: %s", err)
 			}
